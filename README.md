@@ -82,6 +82,8 @@ HR Policy AI Agent Project/
 │   └── services/
 │       ├── geminiService.ts    # Backend API integration
 │       └── localModelService.ts # Local fallback service
+├── n8n/
+│   └── HR Policy Workflow.json # n8n workflow configuration
 └── README.md                   # This file
 ```
 
@@ -101,6 +103,12 @@ HR Policy AI Agent Project/
 - **Vite**: Fast build tool and dev server
 - **Tailwind CSS**: Utility-first CSS framework
 
+### Automation (n8n)
+- **n8n**: Workflow automation platform for document processing
+- **LangChain**: Integration for AI agent orchestration
+- **Vector Store**: Qdrant integration for semantic search
+- **Webhooks**: API integrations for chat and document upload
+
 ## ⚙️ Setup Instructions
 
 ### Prerequisites
@@ -110,6 +118,7 @@ HR Policy AI Agent Project/
 - Ollama installed and running
 - OpenAI API key
 - Qdrant cloud account
+- n8n (optional - for workflow automation)
 
 ### Backend Setup
 
@@ -204,6 +213,147 @@ HR Policy AI Agent Project/
    - Click on "Chat with Policies" tab
    - Type your question about company policies
    - The AI will search through uploaded documents and provide contextual answers
+
+## 🔀 n8n Workflow Alternative
+
+In addition to the FastAPI backend, this project includes an n8n workflow that provides a visual, low-code alternative for document processing and AI chat functionality.
+
+### What is n8n?
+
+n8n is a workflow automation platform that allows you to build complex integrations and automations visually. The HR Policy workflow in this project replicates the core functionality of the FastAPI backend using a visual node-based interface.
+
+### Features of the n8n Workflow
+
+- **Visual Workflow Designer**: Build and modify the HR Policy agent without writing code
+- **AI Agent Integration**: Direct integration with OpenAI for natural language processing
+- **Vector Store Integration**: Qdrant vector database integration for semantic search
+- **Document Processing**: Automated document loading, splitting, and embedding
+- **Webhook Triggers**: RESTful API endpoints for chat and document upload
+- **Memory Management**: Conversation history and session management
+- **Form Integration**: Built-in form for document uploads
+
+### When to Use n8n
+
+Use the n8n workflow if you:
+- **Prefer visual development**: Build workflows without writing code
+- **Need flexibility**: Easily modify workflows to adapt to changing requirements
+- **Want rapid prototyping**: Test different AI configurations quickly
+- **Require integrations**: Connect with other services and databases
+- **Need workflow management**: Built-in monitoring, logging, and error handling
+
+Use the FastAPI backend if you:
+- **Need programmatic control**: Full Python code customization
+- **Want better performance**: Direct API without workflow engine overhead
+- **Prefer code-based development**: Comfortable with Python and FastAPI
+- **Require fine-grained control**: Custom business logic and algorithms
+
+### Setting Up n8n Workflow
+
+#### Prerequisites
+
+- n8n installed (cloud or self-hosted)
+- n8n credentials configured for:
+  - OpenAI API
+  - Qdrant API
+  - Ollama API (if using local embeddings)
+
+#### Installation Steps
+
+1. **Import the Workflow:**
+   - Open your n8n instance
+   - Go to "Workflows" → "Import from File"
+   - Select `n8n/HR Policy Workflow.json`
+   - The workflow will be imported with all nodes configured
+
+2. **Configure Credentials:**
+   ```bash
+   # OpenAI API
+   - Type: OpenAI
+   - API Key: Your OpenAI API key
+   - Base URL: https://api.openai.com/v1
+   
+   # Qdrant API
+   - Type: Qdrant API
+   - URL: Your Qdrant instance URL
+   - API Key: Your Qdrant API key
+   
+   # Ollama API
+   - Type: Ollama API
+   - URL: http://127.0.0.1:11434 (or your Ollama URL)
+   ```
+
+3. **Activate the Workflow:**
+   - Open the imported "HR Policy Workflow"
+   - Click the "Activate" toggle in the top-right corner
+   - The workflow is now ready to receive requests
+
+4. **Get Webhook URLs:**
+   - The workflow exposes two endpoints:
+     - **Chat Webhook**: For sending chat messages
+     - **Form Submission**: For uploading documents
+   - Copy the webhook URLs from the respective nodes
+
+#### Using the n8n Workflow
+
+**Document Upload:**
+```bash
+# Example using curl
+curl -X POST \
+  'https://your-n8n-instance.com/webhook/form-submission' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@policy.pdf' \
+  -F 'policy_type=HR'
+```
+
+**Chat Interface:**
+```bash
+# Example using curl
+curl -X POST \
+  'https://your-n8n-instance.com/webhook/chat' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "query": "What is the vacation policy?",
+    "session_id": "user123"
+  }'
+```
+
+### Workflow Structure
+
+The n8n workflow consists of the following nodes:
+
+- **Webhook Node**: Entry point for chat requests
+- **AI Agent Node**: Orchestrates AI interactions with memory
+- **OpenAI Chat Model**: GPT-4 for generating responses
+- **Simple Memory**: Maintains conversation history
+- **Qdrant Vector Store**: Semantic search in uploaded documents
+- **Embeddings Ollama**: Text embeddings using local model
+- **Recursive Character Text Splitter**: Document chunking
+- **Default Data Loader**: PDF document loading
+- **Form Trigger**: Document upload interface
+
+### Frontend Integration
+
+To use n8n with the existing frontend:
+
+1. **Update API Service:**
+   Modify `frontend/services/geminiService.ts` to point to n8n webhooks:
+
+   ```typescript
+   const API_BASE_URL = 'https://your-n8n-instance.com/webhook';
+   ```
+
+2. **Configure Endpoints:**
+   - Chat endpoint: `/chat`
+   - Upload endpoint: `/upload-policy`
+
+### Benefits of n8n Approach
+
+✅ **Visual Development**: No coding required to modify workflows  
+✅ **Built-in Monitoring**: Track workflow execution and performance  
+✅ **Error Handling**: Automatic retries and error notifications  
+✅ **Scaling**: Built-in support for handling high loads  
+✅ **Extensibility**: Easy to add new integrations and features  
+✅ **Debugging**: Visual debugger for troubleshooting  
 
 ## 🔧 Configuration
 
